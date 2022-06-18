@@ -12,6 +12,8 @@
         public const int RegistryStateEnabled = 1;
         public const int RegistryStateDisabled = 0;
 
+        public const string RegistryAttributeLogFilePath = "LogFilePath";
+
         public const string RegistryAttributeMaxDurationLimitMins = "MaxDurationLimitMins";
         public const int RegistryAttributeMaxDurationLimitMinsEnabledValue = 1000;
         public const int RegistryAttributeMaxDurationLimitMinsDisabledValue = 0;

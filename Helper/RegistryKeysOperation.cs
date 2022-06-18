@@ -69,5 +69,15 @@ namespace RegistryEditor.Helper
                             Constants.RegistryAttributeNumBufferEntriesDisabledValue);
             }
         }
+
+        public static string GetLogFilePath()
+        {
+            using (var key = Registry.LocalMachine.OpenSubKey(Constants.RootRegistryPath, true))
+            {
+                if (key == null) return string.Empty;
+                var path = key.GetValue(Constants.RegistryAttributeLogFilePath).ToString();
+                return path == null ? string.Empty : path;
+            }
+        }
     }
 }

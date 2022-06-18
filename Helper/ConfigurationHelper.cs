@@ -12,21 +12,7 @@ namespace RegistryEditor.Helper
 
         private static GroupRegistryConfiguration Load()
         {
-            //var configuration = new GroupRegistryConfiguration()
-            //{
-            //    Groups = new List<RegistryGroup>()
-            //    {
-            //    new RegistryGroup("Session Summary",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Handles",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Factory Automation",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Wafer Location",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Scan Data",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Diagnostic",true){RegistryValues = new List<RegistryEntry>(){new RegistryEntry(){Path ="TestPath" }}},
-            //    new RegistryGroup("Custom"){},
-            //    }
-            //};
             var configuration = XmlHelper.Load<GroupRegistryConfiguration>();
-            //configuration.Save();
             return configuration;
         }
 

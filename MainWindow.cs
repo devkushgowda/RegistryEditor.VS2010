@@ -64,7 +64,7 @@ namespace RegistryEditor
             node.Tag = registryGroup;
             foreach (var registry in registryGroup.RegistryValues)
             {
-                var registryNode = new TreeNode(registry.Path);
+                var registryNode = new TreeNode(registry.Name);
                 SetNodeState(registryNode, registry.Path);
                 registry.IsChecked = registryNode.Checked;
                 registry.IsMissing = registryNode.ForeColor == Color.Red;
@@ -113,7 +113,7 @@ namespace RegistryEditor
                 var childPath = path + "\\" + key;
                 var node = new TreeNode(key);
                 SetNodeState(node, childPath);
-                node.Tag = new RegistryEntry { IsChecked = node.Checked, Path = childPath };
+                node.Tag = new RegistryEntry { IsChecked = node.Checked, Name = key };
                 //Enable this to load multilevel registry entries under Log.
                 //LoadRegistryNodes(childPath, node.Nodes);
                 nodes.Add(node);
@@ -230,7 +230,7 @@ namespace RegistryEditor
                 {
                     var newNode = new TreeNode(newKey);
                     selectedNode.Nodes.Add(newNode);
-                    var newRegistry = new RegistryEntry { Path = newKey };
+                    var newRegistry = new RegistryEntry { Name = newKey };
                     newNode.Tag = newRegistry;
                     registryGroup.RegistryValues.Add(newRegistry);
                     ConfigurationHelper.Save();
@@ -518,7 +518,7 @@ namespace RegistryEditor
         private void SetLogButtonStates()
         {
             btnOpenFolder.Enabled = Directory.Exists(tbBackupFolder.Text);
-            btnCollectLog.Enabled = btnOpenFolder.Enabled && startDateTimePicker.Value < endDateTimePicker.Value;
+            btnBackupLog.Enabled = btnOpenFolder.Enabled && startDateTimePicker.Value < endDateTimePicker.Value;
         }
 
         private void startDateTimePicker_ValueChanged(object sender, EventArgs e)
@@ -534,6 +534,11 @@ namespace RegistryEditor
         private void tbBackupFolder_TextChanged(object sender, EventArgs e)
         {
             SetLogButtonStates();
+        }
+
+        private void btnBackupLog_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
