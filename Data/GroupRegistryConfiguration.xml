@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GroupRegistryConfiguration xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Groups>
+		<Group Name="Session Summary" IsReadOnly="true">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\TS3D</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\KTAutomationLayer</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Errmgr</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Database</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Browser</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\CarrierID</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\DBConfig</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\\Log\Browser</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Handles" IsReadOnly="true">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\Errmgr</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\TDbUtils</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Factory Automation" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\Errmgr</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Wafer Location" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\HierQuery</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Scan Data" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\WaferID</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Diagnostic" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\DBConfig</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Browser</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\ConfigInfo</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Custom" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\TUtils</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\E87ServiceTrace</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Browser</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\GemSecs</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+		<Group Name="Test" IsReadOnly="false">
+			<RegistryValues>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\Log\\Browser</Path>
+				</Registry>
+				<Registry>
+					<Path>SOFTWARE\Vijay\DemoPro\\Log\CKTSubst</Path>
+				</Registry>
+			</RegistryValues>
+		</Group>
+	</Groups>
+</GroupRegistryConfiguration>
