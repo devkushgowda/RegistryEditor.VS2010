@@ -1,4 +1,6 @@
-﻿namespace RegistryEditor
+﻿using RegistryEditor.Helper;
+
+namespace RegistryEditor
 {
     public static class Constants
     {
@@ -6,7 +8,10 @@
         /// <summary>
         /// Root registry path.
         /// </summary>
-        public const string RootRegistryPath = "SOFTWARE\\Vijay\\DemoPro\\Log";
+        public static string RootRegistryPath
+        {
+            get { return ConfigurationHelper.Configuration.RootRegistryPath; }
+        }
 
         public const string RegistryAttributeStateIdentifier = "All";
         public const int RegistryStateEnabled = 1;
@@ -30,13 +35,13 @@
         public const string DatabaseWarningMessage = "You are going to modify Database registry/group registry, would you like to proceed?";
         public const string ClearAllWarningMessage = "You are going to clear all the registry values in current window, would you like to proceed?";
         public const string GroupRegistryAlreadyExistsMessage = "This group registry with name '{0}' already exists, try again with different name.";
-        public const string RegistryAlreadyMappedMessage = "Registry '{0}' already mapped to this group.";
+        public const string BackupCompletedMessage = "Would you like to browse the backup location?";
         public const string GroupRegistryDeleteConfirmationMessage = "Registry group '{0}' will be deleted permanently, would you like to proceed?";
         public const string InformationTitle = "Information";
         public const string WarningTitle = "Warning!";
         public const string AddNewGroupTitle = "Add new group";
         public const string NewGroupTitle = "Rename group";
-
+        public const string BackupCompletedTitle = "Backup completed.";
         /// <summary>
         /// Add multiple comma separated values, Which will check with ending value of registry.
         /// </summary>
@@ -47,5 +52,6 @@
         /// {1} - Root registry key.
         /// </summary>
         public const string MainWindowTitleFormat = "{0}(Root: {1})";
+
     }
 }

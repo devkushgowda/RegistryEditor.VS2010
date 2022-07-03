@@ -5,14 +5,14 @@ namespace RegistryEditor.Helper
 {
     public static class ConfigurationHelper
     {
-        private static readonly Lazy<GroupRegistryConfiguration> _configuration =
-            new Lazy<GroupRegistryConfiguration>(() => Load());
+        private static readonly Lazy<RegistryEditorConfiguration> _configuration =
+            new Lazy<RegistryEditorConfiguration>(() => Load());
 
-        public static GroupRegistryConfiguration Configuration { get { return _configuration.Value; } }
+        public static RegistryEditorConfiguration Configuration { get { return _configuration.Value; } }
 
-        private static GroupRegistryConfiguration Load()
+        private static RegistryEditorConfiguration Load()
         {
-            var configuration = XmlHelper.Load<GroupRegistryConfiguration>();
+            var configuration = XmlHelper.Load<RegistryEditorConfiguration>();
             return configuration;
         }
 

@@ -11,7 +11,8 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -48,6 +49,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Helper\ConfigurationHelper.cs" />
+    <Compile Include="Helper\LogFilesHelper.cs" />
     <Compile Include="Helper\RegistryKeysOperation.cs" />
     <Compile Include="Helper\XmlHelper.cs" />
     <Compile Include="InputTextForm.cs">
@@ -62,7 +64,7 @@
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\GroupRegistryConfiguration.cs" />
+    <Compile Include="Models\RegistryEditorConfiguration.cs" />
     <Compile Include="Models\RegistryEntry.cs" />
     <Compile Include="Models\RegistryGroup.cs" />
     <Compile Include="Program.cs" />
@@ -106,8 +108,8 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Data\GroupRegistryConfiguration.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="Data\RegistryEditorConfiguration.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

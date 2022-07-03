@@ -140,7 +140,7 @@ namespace RegistryEditor
             this.radioBtnGroupRegistry.Location = new System.Drawing.Point(8, 21);
             this.radioBtnGroupRegistry.Margin = new System.Windows.Forms.Padding(1);
             this.radioBtnGroupRegistry.Name = "radioBtnGroupRegistry";
-            this.radioBtnGroupRegistry.Size = new System.Drawing.Size(113, 17);
+            this.radioBtnGroupRegistry.Size = new System.Drawing.Size(291, 36);
             this.radioBtnGroupRegistry.TabIndex = 13;
             this.radioBtnGroupRegistry.TabStop = true;
             this.radioBtnGroupRegistry.Text = "Group Enablement";
@@ -153,7 +153,7 @@ namespace RegistryEditor
             this.radioBtnManualRegistry.Location = new System.Drawing.Point(434, 21);
             this.radioBtnManualRegistry.Margin = new System.Windows.Forms.Padding(1);
             this.radioBtnManualRegistry.Name = "radioBtnManualRegistry";
-            this.radioBtnManualRegistry.Size = new System.Drawing.Size(119, 17);
+            this.radioBtnManualRegistry.Size = new System.Drawing.Size(306, 36);
             this.radioBtnManualRegistry.TabIndex = 14;
             this.radioBtnManualRegistry.Text = "Manual Enablement";
             this.radioBtnManualRegistry.UseVisualStyleBackColor = true;
@@ -197,6 +197,7 @@ namespace RegistryEditor
             this.groupRegistryTreeView.Name = "groupRegistryTreeView";
             this.groupRegistryTreeView.Size = new System.Drawing.Size(314, 435);
             this.groupRegistryTreeView.TabIndex = 1;
+            this.groupRegistryTreeView.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.groupRegistryTreeView_BeforeCheck);
             this.groupRegistryTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.groupRegistryTreeView_AfterCheck);
             this.groupRegistryTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.groupRegistryTreeView_AfterSelect);
             // 
@@ -245,7 +246,7 @@ namespace RegistryEditor
             this.startDateTimePicker.Location = new System.Drawing.Point(139, 34);
             this.startDateTimePicker.MaxDate = new System.DateTime(2022, 6, 17, 22, 50, 58, 0);
             this.startDateTimePicker.Name = "startDateTimePicker";
-            this.startDateTimePicker.Size = new System.Drawing.Size(220, 20);
+            this.startDateTimePicker.Size = new System.Drawing.Size(220, 38);
             this.startDateTimePicker.TabIndex = 14;
             this.startDateTimePicker.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
             this.startDateTimePicker.ValueChanged += new System.EventHandler(this.startDateTimePicker_ValueChanged);
@@ -254,7 +255,7 @@ namespace RegistryEditor
             // 
             this.tbBackupFolder.Location = new System.Drawing.Point(139, 67);
             this.tbBackupFolder.Name = "tbBackupFolder";
-            this.tbBackupFolder.Size = new System.Drawing.Size(340, 20);
+            this.tbBackupFolder.Size = new System.Drawing.Size(340, 38);
             this.tbBackupFolder.TabIndex = 1;
             this.tbBackupFolder.TextChanged += new System.EventHandler(this.tbBackupFolder_TextChanged);
             // 
@@ -263,7 +264,7 @@ namespace RegistryEditor
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(47, 72);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(79, 13);
+            this.label1.Size = new System.Drawing.Size(206, 32);
             this.label1.TabIndex = 0;
             this.label1.Text = "Backup Folder:";
             // 
@@ -284,7 +285,7 @@ namespace RegistryEditor
             this.endDateTimePicker.Location = new System.Drawing.Point(489, 33);
             this.endDateTimePicker.MaxDate = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
             this.endDateTimePicker.Name = "endDateTimePicker";
-            this.endDateTimePicker.Size = new System.Drawing.Size(220, 20);
+            this.endDateTimePicker.Size = new System.Drawing.Size(220, 38);
             this.endDateTimePicker.TabIndex = 15;
             this.endDateTimePicker.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
             this.endDateTimePicker.ValueChanged += new System.EventHandler(this.endDateTimePicker_ValueChanged);
@@ -294,7 +295,7 @@ namespace RegistryEditor
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(397, 39);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(55, 13);
+            this.label2.Size = new System.Drawing.Size(141, 32);
             this.label2.TabIndex = 17;
             this.label2.Text = "End Date:";
             // 
@@ -303,7 +304,7 @@ namespace RegistryEditor
             this.lblStartDate.AutoSize = true;
             this.lblStartDate.Location = new System.Drawing.Point(47, 39);
             this.lblStartDate.Name = "lblStartDate";
-            this.lblStartDate.Size = new System.Drawing.Size(58, 13);
+            this.lblStartDate.Size = new System.Drawing.Size(150, 32);
             this.lblStartDate.TabIndex = 16;
             this.lblStartDate.Text = "Start Date:";
             // 

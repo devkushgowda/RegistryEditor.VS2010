@@ -4,7 +4,7 @@ namespace RegistryEditor.Helper
 {
     public static class XmlHelper
     {
-        public const string ConfigurationFile = "./data/GroupRegistryConfiguration.xml";
+        public const string ConfigurationFile = "./data/RegistryEditorConfiguration.xml";
 
         public static T Load<T>() where T : new()
         {

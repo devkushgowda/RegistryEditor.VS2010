@@ -2,25 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using RegistryEditor.Models;
 
 namespace RegistryEditor
 {
     public partial class RegistryPicker : Form
     {
-        public string SelectedRegistry { private set; get; }
+        public List<string> SelectedRegistryList { private set; get; }
         public RegistryPicker(TreeNodeCollection treeNodeCollection, List<string> exclude)
         {
             InitializeComponent();
             CopyTree(treeNodeCollection, exclude);
-
             okButton.Enabled = false;
+            SelectedRegistryList = new List<string>();
         }
 
         private void CopyTree(TreeNodeCollection treeNodeCollection, List<string> exclude)
         {
             foreach (TreeNode node in treeNodeCollection)
             {
-                registryTree.Nodes.Add((TreeNode)node.Clone());
+                var clone = (TreeNode)node.Clone();
+                clone.Checked = false;
+                registryTree.Nodes.Add(clone);
                 var xNodes = registryTree.Nodes.AsParallel().Cast<TreeNode>().Where(n => exclude.Contains(n.Text));
                 foreach (var xNode in xNodes)
                 {
@@ -31,22 +34,14 @@ namespace RegistryEditor
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            SelectedRegistry = registryTree.SelectedNode.FullPath;
+            SelectedRegistryList = registryTree.Nodes.AsParallel().Cast<TreeNode>().Where(t => t.Checked)
+                .Select(t => ((RegistryEntry)t.Tag).Name).ToList();
             this.Close();
         }
 
-        private void registryTree_AfterSelect(object sender, TreeViewEventArgs e)
+        private void registryTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            okButton.Enabled = true;
-        }
-
-        private void registryTree_DoubleClick(object sender, EventArgs e)
-        {
-            if (registryTree.SelectedNode != null)
-            {
-                SelectedRegistry = registryTree.SelectedNode.FullPath;
-                this.Close();
-            }
+            okButton.Enabled = registryTree.Nodes.AsParallel().Cast<TreeNode>().Any(t => t.Checked);
         }
     }
 }

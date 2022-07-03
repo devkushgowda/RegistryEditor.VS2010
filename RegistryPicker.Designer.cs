@@ -35,12 +35,12 @@ namespace RegistryEditor
             // 
             // registryTree
             // 
+            this.registryTree.CheckBoxes = true;
             this.registryTree.Location = new System.Drawing.Point(12, 12);
             this.registryTree.Name = "registryTree";
             this.registryTree.Size = new System.Drawing.Size(878, 617);
             this.registryTree.TabIndex = 0;
-            this.registryTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.registryTree_AfterSelect);
-            this.registryTree.DoubleClick += new System.EventHandler(this.registryTree_DoubleClick);
+            this.registryTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.registryTree_AfterCheck);
             // 
             // okButton
             // 

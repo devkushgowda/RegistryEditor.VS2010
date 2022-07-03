@@ -5,9 +5,13 @@ using System.Xml.Serialization;
 namespace RegistryEditor.Models
 {
     [XmlRoot("Configuration")]
-    public class GroupRegistryConfiguration
+    public class RegistryEditorConfiguration
     {
         public static readonly string ConfigurationPath = Directory.GetCurrentDirectory();
+
+        public string DefaultBackupFolder { get; set; }
+
+        public string RootRegistryPath { get; set; }
 
         public string LogFolderPath { get; set; }
 

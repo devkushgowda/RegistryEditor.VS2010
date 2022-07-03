@@ -14,14 +14,14 @@ namespace RegistryEditor
     {
 
 
-        private int _ThreadSafeMutexForCheckedBackValue = 0;
+        private int _threadSafeMutexForCheckedBackValue = 0;
         public bool ThreadSafeMutexForChecked
         {
-            get { return (Interlocked.CompareExchange(ref _ThreadSafeMutexForCheckedBackValue, 1, 1) == 1); }
+            get { return (Interlocked.CompareExchange(ref _threadSafeMutexForCheckedBackValue, 1, 1) == 1); }
             set
             {
-                if (value) Interlocked.CompareExchange(ref _ThreadSafeMutexForCheckedBackValue, 1, 0);
-                else Interlocked.CompareExchange(ref _ThreadSafeMutexForCheckedBackValue, 0, 1);
+                if (value) Interlocked.CompareExchange(ref _threadSafeMutexForCheckedBackValue, 1, 0);
+                else Interlocked.CompareExchange(ref _threadSafeMutexForCheckedBackValue, 0, 1);
             }
         }
 
@@ -38,6 +38,7 @@ namespace RegistryEditor
         private void Initialize()
         {
             this.Text = string.Format(Constants.MainWindowTitleFormat, this.Text, Constants.RootRegistryPath);
+            tbBackupFolder.Text = ConfigurationHelper.Configuration.DefaultBackupFolder;
             Reload();
             SetTreeViewEnabled(radioBtnGroupRegistry.Checked);
             SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
@@ -218,24 +219,18 @@ namespace RegistryEditor
             var registryGroup = (RegistryGroup)selectedNode.Tag;
             var registryPicker = new RegistryPicker(registryTreeView.Nodes, registryGroup.RegistryValues.Select(x => x.Path.Substring(x.Path.LastIndexOf('\\') + 1)).ToList());
             registryPicker.ShowDialog();
-            if (!string.IsNullOrEmpty(registryPicker.SelectedRegistry))
+            if (registryPicker.SelectedRegistryList.Count > 0)
             {
-                var newKey = Constants.RootRegistryPath + "\\" +
-                             registryPicker.SelectedRegistry;
-                if (selectedNode.Nodes.AsParallel().Cast<TreeNode>().Any(node => (node.Tag as RegistryEntry).Path.Equals(newKey, StringComparison.InvariantCultureIgnoreCase)))
+                foreach (var newRegistry in registryPicker.SelectedRegistryList)
                 {
-                    DisplayInformation(string.Format(Constants.RegistryAlreadyMappedMessage, newKey));
-                }
-                else
-                {
-                    var newNode = new TreeNode(newKey);
+                    var newNode = new TreeNode(newRegistry);
                     selectedNode.Nodes.Add(newNode);
-                    var newRegistry = new RegistryEntry { Name = newKey };
+                    var newRegistryEntry = new RegistryEntry { Name = newRegistry };
                     newNode.Tag = newRegistry;
-                    registryGroup.RegistryValues.Add(newRegistry);
-                    ConfigurationHelper.Save();
-                    Reload();
+                    registryGroup.RegistryValues.Add(newRegistryEntry);
                 }
+                ConfigurationHelper.Save();
+                Reload();
             }
 
         }
@@ -257,6 +252,7 @@ namespace RegistryEditor
                 {
                     registryGroup.Name = selectedNode.Text = inputForm.InputText;
                     ConfigurationHelper.Save();
+                    Reload();
                 }
             }
         }
@@ -280,6 +276,7 @@ namespace RegistryEditor
                 selectedNode.Parent.Nodes.Remove(selectedNode);
             }
             ConfigurationHelper.Save();
+            Reload();
         }
 
         private void groupRegistryTreeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -320,7 +317,7 @@ namespace RegistryEditor
                 EnableEditButtons(false);
             }
             btnNewGroup.Enabled = isGroupRegistryTree;
-            btnApplyChanges.Enabled = IsChangesAvailableToApply(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
+            btnRefresh.Enabled = btnApplyChanges.Enabled = IsChangesAvailableToApply(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
             btnClearAll.Enabled = IsChangesAvailableToClear(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
         }
 
@@ -348,6 +345,8 @@ namespace RegistryEditor
                     newNode.Tag = newGroup;
                     ConfigurationHelper.Configuration.Groups.Add(newGroup);
                     ConfigurationHelper.Save();
+                    Reload();
+                    SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
                 }
             }
         }
@@ -538,7 +537,42 @@ namespace RegistryEditor
 
         private void btnBackupLog_Click(object sender, EventArgs e)
         {
+            var destFolder = tbBackupFolder.Text;
+            var logPathFromRegistry = RegistryKeysOperation.GetLogFilePath();
+            var logPathFromConfig = ConfigurationHelper.Configuration.LogFolderPath;
+            var logPathFromRegistryDestFolder =
+                Path.Combine(destFolder, Path.GetFileName(logPathFromRegistry));
+            var logPathFromConfigDestFolder =
+                Path.Combine(destFolder, Path.GetFileName(logPathFromConfig));
+            //Directory.CreateDirectory(logPathFromRegistry);
+            //Directory.CreateDirectory(logPathFromConfig);
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    var t = DateTime.Now.AddHours(-i * 6).ToString("ddMMyyyyHHmmssfff") + ".log";
+            //    File.Create(Path.Combine(logPathFromRegistry, t));
+            //    File.Create(Path.Combine(logPathFromConfig, t));
+            //}
+            LogFilesHelper.Copy(logPathFromRegistry, logPathFromRegistryDestFolder, startDateTimePicker.Value, endDateTimePicker.Value);
+            LogFilesHelper.Copy(logPathFromConfig, logPathFromConfigDestFolder, startDateTimePicker.Value, endDateTimePicker.Value);
+            if (MessageBox.Show(Constants.BackupCompletedMessage, Constants.BackupCompletedTitle,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+            {
+                Process.Start(destFolder);
+            }
+        }
 
+        private void groupRegistryTreeView_BeforeCheck(object sender, TreeViewCancelEventArgs e)
+        {
+            var selectedNode = groupRegistryTreeView.SelectedNode;
+            if (e.Node.Level == 0)
+            {
+                if (e.Node.Nodes.Count == 0)
+                    e.Cancel = true;
+            }
+            else if (e.Action != TreeViewAction.Unknown)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }
