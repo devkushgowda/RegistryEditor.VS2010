@@ -37,13 +37,22 @@ namespace RegistryEditor
 
         private void Initialize()
         {
-            this.Text = string.Format(Constants.MainWindowTitleFormat, this.Text, Constants.RootRegistryPath);
+            this.Text = string.Format(Constants.MainWindowTitleFormat, Constants.RootRegistryPath);
             tbBackupFolder.Text = ConfigurationHelper.Configuration.DefaultBackupFolder;
             Reload();
             SetTreeViewEnabled(radioBtnGroupRegistry.Checked);
             SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
             SetLogButtonStates();
+            ResetDates();
             RegistryKeysOperation.SetLogParameters(IsChangesAvailableToClear(registryTreeView.Nodes));
+        }
+
+        private void ResetDates()
+        {
+            var nextDay = DateTime.Today.AddDays(1);
+            startDateTimePicker.MaxDate = endDateTimePicker.MaxDate = nextDay;
+            startDateTimePicker.Value = DateTime.Today;
+            endDateTimePicker.Value = DateTime.Today.AddDays(-1);
         }
 
 
@@ -216,8 +225,19 @@ namespace RegistryEditor
         private void btnMapRegistry_Click(object sender, EventArgs e)
         {
             var selectedNode = groupRegistryTreeView.SelectedNode;
+            if (MapRegistry(selectedNode))
+            {
+                ConfigurationHelper.Save();
+                Reload();
+            }
+        }
+
+        private bool MapRegistry(TreeNode selectedNode)
+        {
+            var result = false;
             var registryGroup = (RegistryGroup)selectedNode.Tag;
-            var registryPicker = new RegistryPicker(registryTreeView.Nodes, registryGroup.RegistryValues.Select(x => x.Path.Substring(x.Path.LastIndexOf('\\') + 1)).ToList());
+            var registryPicker = new RegistryPicker(selectedNode.FullPath, registryTreeView.Nodes,
+                registryGroup.RegistryValues.Select(x => x.Path.Substring(x.Path.LastIndexOf('\\') + 1)).ToList());
             registryPicker.ShowDialog();
             if (registryPicker.SelectedRegistryList.Count > 0)
             {
@@ -229,10 +249,9 @@ namespace RegistryEditor
                     newNode.Tag = newRegistry;
                     registryGroup.RegistryValues.Add(newRegistryEntry);
                 }
-                ConfigurationHelper.Save();
-                Reload();
+                result = true;
             }
-
+            return result;
         }
 
         private void btnRename_Click(object sender, EventArgs e)
@@ -339,16 +358,23 @@ namespace RegistryEditor
                 }
                 else
                 {
-                    var newNode = new TreeNode(inputForm.InputText);
-                    groupRegistryTreeView.Nodes.Add(newNode);
-                    var newGroup = new RegistryGroup(inputForm.InputText, false);
-                    newNode.Tag = newGroup;
-                    ConfigurationHelper.Configuration.Groups.Add(newGroup);
-                    ConfigurationHelper.Save();
+                    var newGroupTreeNode = CreateNewGroup(inputForm);
+                    MapRegistry(newGroupTreeNode);
                     Reload();
                     SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
                 }
             }
+        }
+
+        private TreeNode CreateNewGroup(InputTextForm inputForm)
+        {
+            var newNode = new TreeNode(inputForm.InputText);
+            groupRegistryTreeView.Nodes.Add(newNode);
+            var newGroup = new RegistryGroup(inputForm.InputText, false);
+            newNode.Tag = newGroup;
+            ConfigurationHelper.Configuration.Groups.Add(newGroup);
+            ConfigurationHelper.Save();
+            return newNode;
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
@@ -544,16 +570,8 @@ namespace RegistryEditor
                 Path.Combine(destFolder, Path.GetFileName(logPathFromRegistry));
             var logPathFromConfigDestFolder =
                 Path.Combine(destFolder, Path.GetFileName(logPathFromConfig));
-            //Directory.CreateDirectory(logPathFromRegistry);
-            //Directory.CreateDirectory(logPathFromConfig);
-            //for (int i = 0; i < 100; i++)
-            //{
-            //    var t = DateTime.Now.AddHours(-i * 6).ToString("ddMMyyyyHHmmssfff") + ".log";
-            //    File.Create(Path.Combine(logPathFromRegistry, t));
-            //    File.Create(Path.Combine(logPathFromConfig, t));
-            //}
-            LogFilesHelper.Copy(logPathFromRegistry, logPathFromRegistryDestFolder, startDateTimePicker.Value, endDateTimePicker.Value);
-            LogFilesHelper.Copy(logPathFromConfig, logPathFromConfigDestFolder, startDateTimePicker.Value, endDateTimePicker.Value);
+            LogFilesHelper.Copy(logPathFromRegistry, logPathFromRegistryDestFolder, startDateTimePicker.Value, endDateTimePicker.Value, Constants.LogFileFilter);
+            LogFilesHelper.Copy(logPathFromConfig, logPathFromConfigDestFolder, startDateTimePicker.Value, endDateTimePicker.Value, Constants.LogFileFilter);
             if (MessageBox.Show(Constants.BackupCompletedMessage, Constants.BackupCompletedTitle,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
             {

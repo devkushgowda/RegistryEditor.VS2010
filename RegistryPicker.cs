@@ -9,12 +9,13 @@ namespace RegistryEditor
     public partial class RegistryPicker : Form
     {
         public List<string> SelectedRegistryList { private set; get; }
-        public RegistryPicker(TreeNodeCollection treeNodeCollection, List<string> exclude)
+        public RegistryPicker(string name, TreeNodeCollection treeNodeCollection, List<string> exclude)
         {
             InitializeComponent();
             CopyTree(treeNodeCollection, exclude);
             okButton.Enabled = false;
             SelectedRegistryList = new List<string>();
+            this.Text = string.Format(Constants.RegistryPickerTitleFormat, name);
         }
 
         private void CopyTree(TreeNodeCollection treeNodeCollection, List<string> exclude)

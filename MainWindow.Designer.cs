@@ -244,7 +244,8 @@ namespace RegistryEditor
             this.startDateTimePicker.CustomFormat = "MMMMdd, yyyy  |  HH:mm";
             this.startDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.startDateTimePicker.Location = new System.Drawing.Point(139, 34);
-            this.startDateTimePicker.MaxDate = new System.DateTime(2022, 6, 17, 22, 50, 58, 0);
+            this.startDateTimePicker.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.startDateTimePicker.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             this.startDateTimePicker.Name = "startDateTimePicker";
             this.startDateTimePicker.Size = new System.Drawing.Size(220, 38);
             this.startDateTimePicker.TabIndex = 14;
@@ -283,7 +284,8 @@ namespace RegistryEditor
             this.endDateTimePicker.CustomFormat = "MMMMdd, yyyy  |  HH:mm";
             this.endDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.endDateTimePicker.Location = new System.Drawing.Point(489, 33);
-            this.endDateTimePicker.MaxDate = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
+            this.endDateTimePicker.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.endDateTimePicker.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
             this.endDateTimePicker.Name = "endDateTimePicker";
             this.endDateTimePicker.Size = new System.Drawing.Size(220, 38);
             this.endDateTimePicker.TabIndex = 15;
@@ -319,7 +321,7 @@ namespace RegistryEditor
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Registry Editor";
+            this.Text = "SP1 Log Collector";
             this.Load += new System.EventHandler(this.MainWindow_Load);
             this.mainGroupBox.ResumeLayout(false);
             this.mainGroupBox.PerformLayout();

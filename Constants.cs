@@ -32,7 +32,7 @@ namespace RegistryEditor
         public const int RegistryAttributeNumBufferEntriesDisabledValue = 0;
 
 
-        public const string DatabaseWarningMessage = "You are going to modify Database registry/group registry, would you like to proceed?";
+        public const string DatabaseWarningMessage = "When you select Database the wafer scan will take more time. Do you still want to enable the setting?";
         public const string ClearAllWarningMessage = "You are going to clear all the registry values in current window, would you like to proceed?";
         public const string GroupRegistryAlreadyExistsMessage = "This group registry with name '{0}' already exists, try again with different name.";
         public const string BackupCompletedMessage = "Would you like to browse the backup location?";
@@ -41,6 +41,7 @@ namespace RegistryEditor
         public const string WarningTitle = "Warning!";
         public const string AddNewGroupTitle = "Add new group";
         public const string NewGroupTitle = "Rename group";
+        public const string LogFileFilter = "*.log|*.txt";
         public const string BackupCompletedTitle = "Backup completed.";
         /// <summary>
         /// Add multiple comma separated values, Which will check with ending value of registry.
@@ -51,7 +52,8 @@ namespace RegistryEditor
         /// {0} - Application name.
         /// {1} - Root registry key.
         /// </summary>
-        public const string MainWindowTitleFormat = "{0}(Root: {1})";
-
+        public const string ApplicationName = "SP1 Log Collector";
+        public const string MainWindowTitleFormat = ApplicationName + " (Root: {0})";
+        public const string RegistryPickerTitleFormat = "RegistryPicker ({0})";
     }
 }
