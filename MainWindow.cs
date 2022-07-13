@@ -12,10 +12,18 @@ namespace RegistryEditor
 {
     public partial class MainWindow : Form
     {
+        private DateTime startDateTime
+        {
+            get { return startDate.Value + startTime.Value.TimeOfDay; }
+        }
 
+        private DateTime endDateTime
+        {
+            get { return endDate.Value + endTime.Value.TimeOfDay; }
+        }
 
         private int _threadSafeMutexForCheckedBackValue = 0;
-        public bool ThreadSafeMutexForChecked
+        private bool ThreadSafeMutexForChecked
         {
             get { return (Interlocked.CompareExchange(ref _threadSafeMutexForCheckedBackValue, 1, 1) == 1); }
             set
@@ -44,17 +52,24 @@ namespace RegistryEditor
             SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
             SetLogButtonStates();
             ResetDates();
-            RegistryKeysOperation.SetLogParameters(IsChangesAvailableToClear(registryTreeView.Nodes));
+            RegistryKeysOperation.SetLogParameters(IsChangesAvailableToReset(registryTreeView.Nodes));
         }
 
+        /// <summary>
+        /// Set datetime initial values.
+        /// </summary>
         private void ResetDates()
         {
             var nextDay = DateTime.Today.AddDays(1);
-            startDateTimePicker.MaxDate = endDateTimePicker.MaxDate = nextDay;
-            startDateTimePicker.Value = DateTime.Today;
-            endDateTimePicker.Value = DateTime.Today.AddDays(-1);
-        }
+            startDate.MaxDate = endDate.MaxDate = nextDay;
 
+            var now = DateTime.Now;
+            now = now.AddSeconds(-now.Second);
+            startDate.Value = now.AddHours(-1).Date;
+            startTime.Value = now.AddHours(-1);
+            endDate.Value = now.Date;
+            endTime.Value = now;
+        }
 
         private void ReloadGroupRegistry()
         {
@@ -91,6 +106,10 @@ namespace RegistryEditor
             SetLoading(false);
         }
 
+        /// <summary>
+        /// To indicate data loading when UI refresh in progress.
+        /// </summary>
+        /// <param name="displayLoader"></param>
         private void SetLoading(bool displayLoader)
         {
             if (displayLoader)
@@ -130,6 +149,11 @@ namespace RegistryEditor
             }
         }
 
+        /// <summary>
+        /// Set individual tree node.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="childPath"></param>
         private void SetNodeState(TreeNode node, string childPath)
         {
             var registryState = RegistryKeysOperation.GetValue(childPath);
@@ -149,18 +173,6 @@ namespace RegistryEditor
                         node.ForeColor = Color.Red;
                         break;
                     }
-            }
-        }
-
-        private void groupRegistryTreeView_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            if (!ThreadSafeMutexForChecked)
-            {
-                ThreadSafeMutexForChecked = true;
-                var checkedNode = e.Node;
-                SetCheckedNodeStatus(checkedNode, checkedNode.Checked);
-                ThreadSafeMutexForChecked = false;
-                SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
             }
         }
 
@@ -199,39 +211,6 @@ namespace RegistryEditor
             }
         }
 
-        private void registryTreeView_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            if (!ThreadSafeMutexForChecked)
-            {
-                ThreadSafeMutexForChecked = true;
-                var checkedNode = e.Node;
-                SetCheckedNodeStatus(checkedNode, checkedNode.Checked);
-                ThreadSafeMutexForChecked = false;
-                SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
-            }
-        }
-
-        private void MainWindow_Load(object sender, EventArgs e)
-        {
-            Initialize();
-        }
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            Reload();
-            SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
-        }
-
-        private void btnMapRegistry_Click(object sender, EventArgs e)
-        {
-            var selectedNode = groupRegistryTreeView.SelectedNode;
-            if (MapRegistry(selectedNode))
-            {
-                ConfigurationHelper.Save();
-                Reload();
-            }
-        }
-
         private bool MapRegistry(TreeNode selectedNode)
         {
             var result = false;
@@ -252,6 +231,265 @@ namespace RegistryEditor
                 result = true;
             }
             return result;
+        }
+
+        private void SetRegistryButtonStates(bool isGroupRegistryTree)
+        {
+            if (isGroupRegistryTree)
+            {
+                var selectedNode = groupRegistryTreeView.SelectedNode;
+                if (selectedNode != null)
+                {
+                    var isReadonly =
+                        ((selectedNode.Level == 0 ? selectedNode.Tag : selectedNode.Parent.Tag) as RegistryGroup)
+                        .IsReadOnly;
+                    if (isReadonly)
+                    {
+                        EnableEditButtons(false);
+                    }
+                    else
+                    {
+                        EnableEditButtons(true);
+                        if (selectedNode.Level != 0)
+                        {
+                            btnRename.Enabled = btnMapRegistry.Enabled = false;
+                        }
+                    }
+                }
+                else
+                {
+                    EnableEditButtons(false);
+                }
+            }
+            else
+            {
+                EnableEditButtons(false);
+            }
+            btnNewGroup.Enabled = isGroupRegistryTree;
+            btnReset.Enabled = btnApplyChanges.Enabled = IsChangesAvailableToApply(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
+            btnClearAll.Enabled = IsChangesAvailableToReset(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
+        }
+
+        public void EnableEditButtons(bool value)
+        {
+            btnDelete.Enabled = btnMapRegistry.Enabled = btnRename.Enabled = value;
+        }
+
+        /// <summary>
+        /// Identify whether changes available to reset.
+        /// </summary>
+        /// <param name="tv">node</param>
+        /// <returns></returns>
+        private bool IsChangesAvailableToReset(TreeNodeCollection tv)
+        {
+            foreach (TreeNode node in tv)
+            {
+                if (node.Tag is RegistryEntry && ((RegistryEntry)node.Tag).IsChecked)
+                {
+                    return true;
+                }
+                else if (IsChangesAvailableToReset(node.Nodes))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Identify whether changes available to Save.
+        /// </summary>
+        /// <param name="tv"></param>
+        /// <returns></returns>
+        private bool IsChangesAvailableToApply(TreeNodeCollection tv)
+        {
+            foreach (TreeNode node in tv)
+            {
+                if (node.Tag is RegistryEntry)
+                {
+                    var re = node.Tag as RegistryEntry;
+                    if (re.IsChecked != node.Checked)
+                        return true;
+                }
+                else if (IsChangesAvailableToApply(node.Nodes))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private TreeNode CreateNewGroup(InputTextForm inputForm)
+        {
+            var newNode = new TreeNode(inputForm.InputText);
+            groupRegistryTreeView.Nodes.Add(newNode);
+            var newGroup = new RegistryGroup(inputForm.InputText, false);
+            newNode.Tag = newGroup;
+            ConfigurationHelper.Configuration.Groups.Add(newGroup);
+            ConfigurationHelper.Save();
+            return newNode;
+        }
+
+        private bool ShowWarning(string title)
+        {
+            var res = MessageBox.Show(title, Constants.WarningTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            return res == DialogResult.Yes;
+        }
+
+        private bool IsCriticalNode(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode eNode in nodes)
+            {
+                if (eNode.Tag is RegistryEntry)
+                {
+                    var re = (RegistryEntry)eNode.Tag;
+                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path) && Constants
+                            .CriticalKeysForWarning.Split(',').Any(val =>
+                                re.Path.EndsWith(val.Trim(), StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        return true;
+                    }
+                }
+                if (IsCriticalNode(eNode.Nodes))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Set all child values of single node.
+        /// </summary>
+        /// <param name="nodes"></param>
+        private void SetValues(TreeNodeCollection nodes)
+        {
+            foreach (TreeNode eNode in nodes)
+            {
+                if (eNode.Tag is RegistryEntry)
+                {
+                    var re = (RegistryEntry)eNode.Tag;
+                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path))
+                    {
+                        RegistryKeysOperation.SetRegistryValue(re.Path, eNode.Checked);
+                    }
+                }
+                SetValues(eNode.Nodes);
+            }
+        }
+
+        /// <summary>
+        /// Set all the node values.
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="value"></param>
+        private void SetAllValues(TreeNodeCollection nodes, bool value)
+        {
+            foreach (TreeNode eNode in nodes)
+            {
+                if (eNode.Tag is RegistryEntry)
+                {
+                    var re = (RegistryEntry)eNode.Tag;
+                    if (re != null && !string.IsNullOrWhiteSpace(re.Path))
+                    {
+                        RegistryKeysOperation.SetRegistryValue(re.Path, value);
+                    }
+                }
+                SetAllValues(eNode.Nodes, value);
+            }
+        }
+
+        /// <summary>
+        /// Set tree enable disable states.
+        /// </summary>
+        /// <param name="isGroupRegistryTree"></param>
+        private void SetTreeViewEnabled(bool isGroupRegistryTree)
+        {
+            if (isGroupRegistryTree)
+            {
+                SetTreeState(registryTreeView, false);
+                SetTreeState(groupRegistryTreeView, true);
+            }
+            else
+            {
+                SetTreeState(registryTreeView, true);
+                SetTreeState(groupRegistryTreeView, false);
+            }
+            Reload();
+            SetRegistryButtonStates(isGroupRegistryTree);
+        }
+
+        /// <summary>
+        /// Set tree enable disable look.
+        /// </summary>
+        /// <param name="tv"></param>
+        /// <param name="enabled"></param>
+        private void SetTreeState(CustomTreeView tv, bool enabled)
+        {
+            tv.Enabled = enabled;
+            tv.BackColor = enabled ? Color.White : Color.LightGray;
+            tv.LineColor = enabled ? Color.Black : Color.Gray;
+            tv.ForeColor = enabled ? Color.Black : Color.Gray;
+        }
+
+        /// <summary>
+        /// Set log button states.
+        /// </summary>
+        private void SetLogButtonStates()
+        {
+            var backupFolderExists = Directory.Exists(tbBackupFolder.Text);
+            if (btnOpenFolder.Enabled)
+                btnOpenFolder.Enabled = backupFolderExists;
+            btnBackupLog.Enabled = backupFolderExists && startDateTime < endDateTime;
+        }
+
+        /// <summary>
+        /// Get log destination folder path.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string GetLogDestinationFolder(string path)
+        {
+            return Path.Combine(tbBackupFolder.Text,
+                string.Format(Constants.BackupLogsFolder,
+                    startDateTime.ToString(Constants.BackupDateTimeFormat),
+                    endDateTime.ToString(Constants.BackupDateTimeFormat)),
+                Path.GetFileName(path));
+        }
+
+        #region EventHandlers
+
+        private void groupRegistryTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (!ThreadSafeMutexForChecked)
+            {
+                ThreadSafeMutexForChecked = true;
+                var checkedNode = e.Node;
+                SetCheckedNodeStatus(checkedNode, checkedNode.Checked);
+                ThreadSafeMutexForChecked = false;
+                SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
+            }
+        }
+
+        private void btnNewGroup_Click(object sender, EventArgs e)
+        {
+            var inputForm = new InputTextForm(Constants.AddNewGroupTitle, string.Empty);
+            inputForm.ShowDialog();
+            if (!string.IsNullOrEmpty(inputForm.InputText))
+            {
+                if (groupRegistryTreeView.Nodes.AsParallel().Cast<TreeNode>().Any(node =>
+                        node.Text.Equals(inputForm.InputText, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    DisplayInformation(string.Format(Constants.GroupRegistryAlreadyExistsMessage, inputForm.InputText));
+                }
+                else
+                {
+                    var newGroupTreeNode = CreateNewGroup(inputForm);
+                    MapRegistry(newGroupTreeNode);
+                    Reload();
+                    SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
+                }
+            }
         }
 
         private void btnRename_Click(object sender, EventArgs e)
@@ -303,78 +541,23 @@ namespace RegistryEditor
             SetRegistryButtonStates(true);
         }
 
-        private void SetRegistryButtonStates(bool isGroupRegistryTree)
+        private void btnApplyChanges_Click(object sender, EventArgs e)
         {
-            if (isGroupRegistryTree)
+            var tv = radioBtnGroupRegistry.Checked ? groupRegistryTreeView : registryTreeView;
+            if (IsCriticalNode(tv.Nodes) &&
+                !ShowWarning(Constants.DatabaseWarningMessage))
             {
-                var selectedNode = groupRegistryTreeView.SelectedNode;
-                if (selectedNode != null)
-                {
-                    var isReadonly =
-                        ((selectedNode.Level == 0 ? selectedNode.Tag : selectedNode.Parent.Tag) as RegistryGroup)
-                        .IsReadOnly;
-                    if (isReadonly)
-                    {
-                        EnableEditButtons(false);
-                    }
-                    else
-                    {
-                        EnableEditButtons(true);
-                        if (selectedNode.Level != 0)
-                        {
-                            btnRename.Enabled = btnMapRegistry.Enabled = false;
-                        }
-                    }
-                }
-                else
-                {
-                    EnableEditButtons(false);
-                }
+                return;
             }
-            else
-            {
-                EnableEditButtons(false);
-            }
-            btnNewGroup.Enabled = isGroupRegistryTree;
-            btnRefresh.Enabled = btnApplyChanges.Enabled = IsChangesAvailableToApply(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
-            btnClearAll.Enabled = IsChangesAvailableToClear(isGroupRegistryTree ? groupRegistryTreeView.Nodes : registryTreeView.Nodes);
+            SetValues(tv.Nodes);
+            Reload();
+            RegistryKeysOperation.SetLogParameters(IsChangesAvailableToReset(registryTreeView.Nodes));
+            SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
         }
 
-        public void EnableEditButtons(bool value)
+        private void radioBtnGroupRegistry_CheckedChanged(object sender, EventArgs e)
         {
-            btnDelete.Enabled = btnMapRegistry.Enabled = btnRename.Enabled = value;
-        }
-
-        private void btnNewGroup_Click(object sender, EventArgs e)
-        {
-            var inputForm = new InputTextForm(Constants.AddNewGroupTitle, string.Empty);
-            inputForm.ShowDialog();
-            if (!string.IsNullOrEmpty(inputForm.InputText))
-            {
-                if (groupRegistryTreeView.Nodes.AsParallel().Cast<TreeNode>().Any(node =>
-                        node.Text.Equals(inputForm.InputText, StringComparison.InvariantCultureIgnoreCase)))
-                {
-                    DisplayInformation(string.Format(Constants.GroupRegistryAlreadyExistsMessage, inputForm.InputText));
-                }
-                else
-                {
-                    var newGroupTreeNode = CreateNewGroup(inputForm);
-                    MapRegistry(newGroupTreeNode);
-                    Reload();
-                    SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
-                }
-            }
-        }
-
-        private TreeNode CreateNewGroup(InputTextForm inputForm)
-        {
-            var newNode = new TreeNode(inputForm.InputText);
-            groupRegistryTreeView.Nodes.Add(newNode);
-            var newGroup = new RegistryGroup(inputForm.InputText, false);
-            newNode.Tag = newGroup;
-            ConfigurationHelper.Configuration.Groups.Add(newGroup);
-            ConfigurationHelper.Save();
-            return newNode;
+            SetTreeViewEnabled((sender as RadioButton).Checked);
         }
 
         private void btnClearAll_Click(object sender, EventArgs e)
@@ -390,143 +573,6 @@ namespace RegistryEditor
             SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
         }
 
-        private bool IsChangesAvailableToClear(TreeNodeCollection tv)
-        {
-            foreach (TreeNode node in tv)
-            {
-                if (node.Tag is RegistryEntry && ((RegistryEntry)node.Tag).IsChecked)
-                {
-                    return true;
-                }
-                else if (IsChangesAvailableToClear(node.Nodes))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool IsChangesAvailableToApply(TreeNodeCollection tv)
-        {
-            foreach (TreeNode node in tv)
-            {
-                if (node.Tag is RegistryEntry)
-                {
-                    var re = node.Tag as RegistryEntry;
-                    if (re.IsChecked != node.Checked)
-                        return true;
-                }
-                else if (IsChangesAvailableToApply(node.Nodes))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void btnApplyChanges_Click(object sender, EventArgs e)
-        {
-            var tv = radioBtnGroupRegistry.Checked ? groupRegistryTreeView : registryTreeView;
-            if (IsCriticalNode(tv.Nodes) &&
-                !ShowWarning(Constants.DatabaseWarningMessage))
-            {
-                return;
-            }
-            SetValues(tv.Nodes);
-            Reload();
-            RegistryKeysOperation.SetLogParameters(IsChangesAvailableToClear(registryTreeView.Nodes));
-            SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
-        }
-
-        private bool ShowWarning(string title)
-        {
-            var res = MessageBox.Show(title, Constants.WarningTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            return res == DialogResult.Yes;
-        }
-
-        private bool IsCriticalNode(TreeNodeCollection nodes)
-        {
-            foreach (TreeNode eNode in nodes)
-            {
-                if (eNode.Tag is RegistryEntry)
-                {
-                    var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path) && Constants
-                            .CriticalKeysForWarning.Split(',').Any(val =>
-                                re.Path.EndsWith(val.Trim(), StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        return true;
-                    }
-                }
-                if (IsCriticalNode(eNode.Nodes))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private void SetValues(TreeNodeCollection nodes)
-        {
-            foreach (TreeNode eNode in nodes)
-            {
-                if (eNode.Tag is RegistryEntry)
-                {
-                    var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path))
-                    {
-                        RegistryKeysOperation.SetRegistryValue(re.Path, eNode.Checked);
-                    }
-                }
-                SetValues(eNode.Nodes);
-            }
-        }
-
-        private void SetAllValues(TreeNodeCollection nodes, bool value)
-        {
-            foreach (TreeNode eNode in nodes)
-            {
-                if (eNode.Tag is RegistryEntry)
-                {
-                    var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && !string.IsNullOrWhiteSpace(re.Path))
-                    {
-                        RegistryKeysOperation.SetRegistryValue(re.Path, value);
-                    }
-                }
-                SetAllValues(eNode.Nodes, value);
-            }
-        }
-
-        private void radioBtnGroupRegistry_CheckedChanged(object sender, EventArgs e)
-        {
-            SetTreeViewEnabled((sender as RadioButton).Checked);
-        }
-
-        private void SetTreeViewEnabled(bool isGroupRegistryTree)
-        {
-            if (isGroupRegistryTree)
-            {
-                SetTreeState(registryTreeView, false);
-                SetTreeState(groupRegistryTreeView, true);
-            }
-            else
-            {
-                SetTreeState(registryTreeView, true);
-                SetTreeState(groupRegistryTreeView, false);
-            }
-            Reload();
-            SetRegistryButtonStates(isGroupRegistryTree);
-        }
-
-        private void SetTreeState(CustomTreeView tv, bool enabled)
-        {
-            tv.Enabled = enabled;
-            tv.BackColor = enabled ? Color.White : Color.LightGray;
-            tv.LineColor = enabled ? Color.Black : Color.Gray;
-            tv.ForeColor = enabled ? Color.Black : Color.Gray;
-        }
-
         private void btnBrowse_Click(object sender, EventArgs e)
         {
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
@@ -540,20 +586,38 @@ namespace RegistryEditor
         {
             Process.Start(tbBackupFolder.Text);
         }
-        private void SetLogButtonStates()
+
+        private void registryTreeView_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            btnOpenFolder.Enabled = Directory.Exists(tbBackupFolder.Text);
-            btnBackupLog.Enabled = btnOpenFolder.Enabled && startDateTimePicker.Value < endDateTimePicker.Value;
+            if (!ThreadSafeMutexForChecked)
+            {
+                ThreadSafeMutexForChecked = true;
+                var checkedNode = e.Node;
+                SetCheckedNodeStatus(checkedNode, checkedNode.Checked);
+                ThreadSafeMutexForChecked = false;
+                SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
+            }
         }
 
-        private void startDateTimePicker_ValueChanged(object sender, EventArgs e)
+        private void MainWindow_Load(object sender, EventArgs e)
         {
-            SetLogButtonStates();
+            Initialize();
         }
 
-        private void endDateTimePicker_ValueChanged(object sender, EventArgs e)
+        private void btnReset_Click(object sender, EventArgs e)
         {
-            SetLogButtonStates();
+            Reload();
+            SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
+        }
+
+        private void btnMapRegistry_Click(object sender, EventArgs e)
+        {
+            var selectedNode = groupRegistryTreeView.SelectedNode;
+            if (MapRegistry(selectedNode))
+            {
+                ConfigurationHelper.Save();
+                Reload();
+            }
         }
 
         private void tbBackupFolder_TextChanged(object sender, EventArgs e)
@@ -563,19 +627,17 @@ namespace RegistryEditor
 
         private void btnBackupLog_Click(object sender, EventArgs e)
         {
-            var destFolder = tbBackupFolder.Text;
+            btnOpenFolder.Enabled = true;
+            btnBackupLog.Enabled = false;
             var logPathFromRegistry = RegistryKeysOperation.GetLogFilePath();
             var logPathFromConfig = ConfigurationHelper.Configuration.LogFolderPath;
-            var logPathFromRegistryDestFolder =
-                Path.Combine(destFolder, Path.GetFileName(logPathFromRegistry));
-            var logPathFromConfigDestFolder =
-                Path.Combine(destFolder, Path.GetFileName(logPathFromConfig));
-            LogFilesHelper.Copy(logPathFromRegistry, logPathFromRegistryDestFolder, startDateTimePicker.Value, endDateTimePicker.Value, Constants.LogFileFilter);
-            LogFilesHelper.Copy(logPathFromConfig, logPathFromConfigDestFolder, startDateTimePicker.Value, endDateTimePicker.Value, Constants.LogFileFilter);
+
+            LogFilesHelper.Copy(logPathFromRegistry, GetLogDestinationFolder(logPathFromRegistry), startDateTime, endDateTime, Constants.LogFileFilter);
+            LogFilesHelper.Copy(logPathFromConfig, GetLogDestinationFolder(logPathFromConfig), startDateTime, endDateTime, Constants.LogFileFilter);
             if (MessageBox.Show(Constants.BackupCompletedMessage, Constants.BackupCompletedTitle,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
             {
-                Process.Start(destFolder);
+                Process.Start(GetLogDestinationFolder(string.Empty));
             }
         }
 
@@ -592,5 +654,31 @@ namespace RegistryEditor
                 e.Cancel = true;
             }
         }
+
+        private void endTime_ValueChanged(object sender, EventArgs e)
+        {
+            SetLogButtonStates();
+        }
+
+        private void endDate_ValueChanged(object sender, EventArgs e)
+        {
+            SetLogButtonStates();
+        }
+
+        private void startTime_ValueChanged(object sender, EventArgs e)
+        {
+            SetLogButtonStates();
+        }
+
+        private void startDate_ValueChanged(object sender, EventArgs e)
+        {
+            SetLogButtonStates();
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
     }
 }

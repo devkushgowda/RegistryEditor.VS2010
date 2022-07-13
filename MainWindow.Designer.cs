@@ -30,7 +30,7 @@ namespace RegistryEditor
         private void InitializeComponent()
         {
             this.btnMapRegistry = new System.Windows.Forms.Button();
-            this.btnRefresh = new System.Windows.Forms.Button();
+            this.btnReset = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnRename = new System.Windows.Forms.Button();
             this.btnNewGroup = new System.Windows.Forms.Button();
@@ -40,16 +40,19 @@ namespace RegistryEditor
             this.radioBtnGroupRegistry = new System.Windows.Forms.RadioButton();
             this.radioBtnManualRegistry = new System.Windows.Forms.RadioButton();
             this.mainGroupBox = new System.Windows.Forms.GroupBox();
+            this.btnExit = new System.Windows.Forms.Button();
             this.registryTreeView = new RegistryEditor.CustomTreeView();
             this.groupRegistryTreeView = new RegistryEditor.CustomTreeView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.endTime = new System.Windows.Forms.DateTimePicker();
+            this.endDate = new System.Windows.Forms.DateTimePicker();
+            this.startTime = new System.Windows.Forms.DateTimePicker();
             this.btnOpenFolder = new System.Windows.Forms.Button();
             this.btnBrowse = new System.Windows.Forms.Button();
-            this.startDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.startDate = new System.Windows.Forms.DateTimePicker();
             this.tbBackupFolder = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnBackupLog = new System.Windows.Forms.Button();
-            this.endDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
             this.lblStartDate = new System.Windows.Forms.Label();
             this.mainGroupBox.SuspendLayout();
@@ -58,7 +61,7 @@ namespace RegistryEditor
             // 
             // btnMapRegistry
             // 
-            this.btnMapRegistry.Location = new System.Drawing.Point(330, 286);
+            this.btnMapRegistry.Location = new System.Drawing.Point(331, 210);
             this.btnMapRegistry.Margin = new System.Windows.Forms.Padding(1);
             this.btnMapRegistry.Name = "btnMapRegistry";
             this.btnMapRegistry.Size = new System.Drawing.Size(94, 26);
@@ -67,20 +70,20 @@ namespace RegistryEditor
             this.btnMapRegistry.UseVisualStyleBackColor = true;
             this.btnMapRegistry.Click += new System.EventHandler(this.btnMapRegistry_Click);
             // 
-            // btnRefresh
+            // btnReset
             // 
-            this.btnRefresh.Location = new System.Drawing.Point(330, 223);
-            this.btnRefresh.Margin = new System.Windows.Forms.Padding(1);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(94, 26);
-            this.btnRefresh.TabIndex = 6;
-            this.btnRefresh.Text = "Reset";
-            this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            this.btnReset.Location = new System.Drawing.Point(331, 150);
+            this.btnReset.Margin = new System.Windows.Forms.Padding(1);
+            this.btnReset.Name = "btnReset";
+            this.btnReset.Size = new System.Drawing.Size(94, 26);
+            this.btnReset.TabIndex = 6;
+            this.btnReset.Text = "Reset";
+            this.btnReset.UseVisualStyleBackColor = true;
+            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(330, 349);
+            this.btnDelete.Location = new System.Drawing.Point(331, 270);
             this.btnDelete.Margin = new System.Windows.Forms.Padding(1);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(94, 26);
@@ -91,7 +94,7 @@ namespace RegistryEditor
             // 
             // btnRename
             // 
-            this.btnRename.Location = new System.Drawing.Point(330, 318);
+            this.btnRename.Location = new System.Drawing.Point(331, 240);
             this.btnRename.Margin = new System.Windows.Forms.Padding(1);
             this.btnRename.Name = "btnRename";
             this.btnRename.Size = new System.Drawing.Size(94, 26);
@@ -102,7 +105,7 @@ namespace RegistryEditor
             // 
             // btnNewGroup
             // 
-            this.btnNewGroup.Location = new System.Drawing.Point(330, 255);
+            this.btnNewGroup.Location = new System.Drawing.Point(331, 180);
             this.btnNewGroup.Margin = new System.Windows.Forms.Padding(1);
             this.btnNewGroup.Name = "btnNewGroup";
             this.btnNewGroup.Size = new System.Drawing.Size(94, 26);
@@ -113,7 +116,7 @@ namespace RegistryEditor
             // 
             // btnClearAll
             // 
-            this.btnClearAll.Location = new System.Drawing.Point(330, 192);
+            this.btnClearAll.Location = new System.Drawing.Point(331, 120);
             this.btnClearAll.Margin = new System.Windows.Forms.Padding(1);
             this.btnClearAll.Name = "btnClearAll";
             this.btnClearAll.Size = new System.Drawing.Size(94, 26);
@@ -124,7 +127,7 @@ namespace RegistryEditor
             // 
             // btnApplyChanges
             // 
-            this.btnApplyChanges.Location = new System.Drawing.Point(330, 161);
+            this.btnApplyChanges.Location = new System.Drawing.Point(331, 90);
             this.btnApplyChanges.Margin = new System.Windows.Forms.Padding(1);
             this.btnApplyChanges.Name = "btnApplyChanges";
             this.btnApplyChanges.Size = new System.Drawing.Size(94, 26);
@@ -160,6 +163,7 @@ namespace RegistryEditor
             // 
             // mainGroupBox
             // 
+            this.mainGroupBox.Controls.Add(this.btnExit);
             this.mainGroupBox.Controls.Add(this.radioBtnManualRegistry);
             this.mainGroupBox.Controls.Add(this.radioBtnGroupRegistry);
             this.mainGroupBox.Controls.Add(this.registryTreeView);
@@ -167,7 +171,7 @@ namespace RegistryEditor
             this.mainGroupBox.Controls.Add(this.groupRegistryTreeView);
             this.mainGroupBox.Controls.Add(this.btnClearAll);
             this.mainGroupBox.Controls.Add(this.btnMapRegistry);
-            this.mainGroupBox.Controls.Add(this.btnRefresh);
+            this.mainGroupBox.Controls.Add(this.btnReset);
             this.mainGroupBox.Controls.Add(this.btnNewGroup);
             this.mainGroupBox.Controls.Add(this.btnDelete);
             this.mainGroupBox.Controls.Add(this.btnRename);
@@ -175,9 +179,20 @@ namespace RegistryEditor
             this.mainGroupBox.Margin = new System.Windows.Forms.Padding(1);
             this.mainGroupBox.Name = "mainGroupBox";
             this.mainGroupBox.Padding = new System.Windows.Forms.Padding(1);
-            this.mainGroupBox.Size = new System.Drawing.Size(760, 483);
+            this.mainGroupBox.Size = new System.Drawing.Size(760, 382);
             this.mainGroupBox.TabIndex = 15;
             this.mainGroupBox.TabStop = false;
+            // 
+            // btnExit
+            // 
+            this.btnExit.Location = new System.Drawing.Point(331, 300);
+            this.btnExit.Margin = new System.Windows.Forms.Padding(1);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(94, 26);
+            this.btnExit.TabIndex = 15;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // registryTreeView
             // 
@@ -185,7 +200,7 @@ namespace RegistryEditor
             this.registryTreeView.Location = new System.Drawing.Point(434, 40);
             this.registryTreeView.Margin = new System.Windows.Forms.Padding(1);
             this.registryTreeView.Name = "registryTreeView";
-            this.registryTreeView.Size = new System.Drawing.Size(320, 435);
+            this.registryTreeView.Size = new System.Drawing.Size(320, 335);
             this.registryTreeView.TabIndex = 0;
             this.registryTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.registryTreeView_AfterCheck);
             // 
@@ -195,7 +210,7 @@ namespace RegistryEditor
             this.groupRegistryTreeView.Location = new System.Drawing.Point(8, 40);
             this.groupRegistryTreeView.Margin = new System.Windows.Forms.Padding(1);
             this.groupRegistryTreeView.Name = "groupRegistryTreeView";
-            this.groupRegistryTreeView.Size = new System.Drawing.Size(314, 435);
+            this.groupRegistryTreeView.Size = new System.Drawing.Size(314, 335);
             this.groupRegistryTreeView.TabIndex = 1;
             this.groupRegistryTreeView.BeforeCheck += new System.Windows.Forms.TreeViewCancelEventHandler(this.groupRegistryTreeView_BeforeCheck);
             this.groupRegistryTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.groupRegistryTreeView_AfterCheck);
@@ -203,27 +218,71 @@ namespace RegistryEditor
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.endTime);
+            this.groupBox2.Controls.Add(this.endDate);
+            this.groupBox2.Controls.Add(this.startTime);
             this.groupBox2.Controls.Add(this.btnOpenFolder);
             this.groupBox2.Controls.Add(this.btnBrowse);
-            this.groupBox2.Controls.Add(this.startDateTimePicker);
+            this.groupBox2.Controls.Add(this.startDate);
             this.groupBox2.Controls.Add(this.tbBackupFolder);
             this.groupBox2.Controls.Add(this.label1);
             this.groupBox2.Controls.Add(this.btnBackupLog);
-            this.groupBox2.Controls.Add(this.endDateTimePicker);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.lblStartDate);
-            this.groupBox2.Location = new System.Drawing.Point(5, 486);
+            this.groupBox2.Location = new System.Drawing.Point(5, 384);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(760, 109);
+            this.groupBox2.Size = new System.Drawing.Size(760, 116);
             this.groupBox2.TabIndex = 19;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Backup Logs";
             // 
+            // endTime
+            // 
+            this.endTime.CustomFormat = "HH : mm : ss";
+            this.endTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endTime.Location = new System.Drawing.Point(637, 34);
+            this.endTime.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.endTime.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
+            this.endTime.Name = "endTime";
+            this.endTime.ShowUpDown = true;
+            this.endTime.Size = new System.Drawing.Size(77, 38);
+            this.endTime.TabIndex = 23;
+            this.endTime.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
+            this.endTime.ValueChanged += new System.EventHandler(this.endTime_ValueChanged);
+            // 
+            // endDate
+            // 
+            this.endDate.CustomFormat = "MMMMdd, yyyy";
+            this.endDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endDate.Location = new System.Drawing.Point(489, 34);
+            this.endDate.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.endDate.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
+            this.endDate.Name = "endDate";
+            this.endDate.Size = new System.Drawing.Size(142, 38);
+            this.endDate.TabIndex = 22;
+            this.endDate.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
+            this.endDate.ValueChanged += new System.EventHandler(this.endDate_ValueChanged);
+            // 
+            // startTime
+            // 
+            this.startTime.CustomFormat = "HH : mm : ss";
+            this.startTime.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startTime.Location = new System.Drawing.Point(287, 34);
+            this.startTime.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.startTime.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
+            this.startTime.Name = "startTime";
+            this.startTime.ShowUpDown = true;
+            this.startTime.Size = new System.Drawing.Size(77, 38);
+            this.startTime.TabIndex = 21;
+            this.startTime.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
+            this.startTime.ValueChanged += new System.EventHandler(this.startTime_ValueChanged);
+            // 
             // btnOpenFolder
             // 
-            this.btnOpenFolder.Location = new System.Drawing.Point(527, 67);
+            this.btnOpenFolder.Enabled = false;
+            this.btnOpenFolder.Location = new System.Drawing.Point(637, 73);
             this.btnOpenFolder.Name = "btnOpenFolder";
-            this.btnOpenFolder.Size = new System.Drawing.Size(100, 22);
+            this.btnOpenFolder.Size = new System.Drawing.Size(77, 22);
             this.btnOpenFolder.TabIndex = 20;
             this.btnOpenFolder.Text = "Open Folder";
             this.btnOpenFolder.UseVisualStyleBackColor = true;
@@ -231,30 +290,30 @@ namespace RegistryEditor
             // 
             // btnBrowse
             // 
-            this.btnBrowse.Location = new System.Drawing.Point(489, 67);
+            this.btnBrowse.Location = new System.Drawing.Point(489, 73);
             this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(32, 22);
+            this.btnBrowse.Size = new System.Drawing.Size(32, 20);
             this.btnBrowse.TabIndex = 19;
             this.btnBrowse.Text = "...";
             this.btnBrowse.UseVisualStyleBackColor = true;
             this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
             // 
-            // startDateTimePicker
+            // startDate
             // 
-            this.startDateTimePicker.CustomFormat = "MMMMdd, yyyy  |  HH:mm";
-            this.startDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.startDateTimePicker.Location = new System.Drawing.Point(139, 34);
-            this.startDateTimePicker.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
-            this.startDateTimePicker.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            this.startDateTimePicker.Name = "startDateTimePicker";
-            this.startDateTimePicker.Size = new System.Drawing.Size(220, 38);
-            this.startDateTimePicker.TabIndex = 14;
-            this.startDateTimePicker.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
-            this.startDateTimePicker.ValueChanged += new System.EventHandler(this.startDateTimePicker_ValueChanged);
+            this.startDate.CustomFormat = "MMMMdd, yyyy";
+            this.startDate.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startDate.Location = new System.Drawing.Point(139, 34);
+            this.startDate.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
+            this.startDate.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
+            this.startDate.Name = "startDate";
+            this.startDate.Size = new System.Drawing.Size(142, 38);
+            this.startDate.TabIndex = 14;
+            this.startDate.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
+            this.startDate.ValueChanged += new System.EventHandler(this.startDate_ValueChanged);
             // 
             // tbBackupFolder
             // 
-            this.tbBackupFolder.Location = new System.Drawing.Point(139, 67);
+            this.tbBackupFolder.Location = new System.Drawing.Point(139, 73);
             this.tbBackupFolder.Name = "tbBackupFolder";
             this.tbBackupFolder.Size = new System.Drawing.Size(340, 38);
             this.tbBackupFolder.TabIndex = 1;
@@ -263,7 +322,7 @@ namespace RegistryEditor
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(47, 72);
+            this.label1.Location = new System.Drawing.Point(47, 78);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(206, 32);
             this.label1.TabIndex = 0;
@@ -271,26 +330,13 @@ namespace RegistryEditor
             // 
             // btnBackupLog
             // 
-            this.btnBackupLog.Location = new System.Drawing.Point(634, 67);
+            this.btnBackupLog.Location = new System.Drawing.Point(527, 70);
             this.btnBackupLog.Name = "btnBackupLog";
-            this.btnBackupLog.Size = new System.Drawing.Size(74, 22);
+            this.btnBackupLog.Size = new System.Drawing.Size(104, 25);
             this.btnBackupLog.TabIndex = 18;
             this.btnBackupLog.Text = "Backup";
             this.btnBackupLog.UseVisualStyleBackColor = true;
             this.btnBackupLog.Click += new System.EventHandler(this.btnBackupLog_Click);
-            // 
-            // endDateTimePicker
-            // 
-            this.endDateTimePicker.CustomFormat = "MMMMdd, yyyy  |  HH:mm";
-            this.endDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.endDateTimePicker.Location = new System.Drawing.Point(489, 33);
-            this.endDateTimePicker.MaxDate = new System.DateTime(2300, 1, 1, 0, 0, 0, 0);
-            this.endDateTimePicker.MinDate = new System.DateTime(2000, 1, 1, 0, 0, 0, 0);
-            this.endDateTimePicker.Name = "endDateTimePicker";
-            this.endDateTimePicker.Size = new System.Drawing.Size(220, 38);
-            this.endDateTimePicker.TabIndex = 15;
-            this.endDateTimePicker.Value = new System.DateTime(2022, 6, 17, 0, 0, 0, 0);
-            this.endDateTimePicker.ValueChanged += new System.EventHandler(this.endDateTimePicker_ValueChanged);
             // 
             // label2
             // 
@@ -313,7 +359,7 @@ namespace RegistryEditor
             // MainWindow
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(770, 599);
+            this.ClientSize = new System.Drawing.Size(770, 504);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.mainGroupBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -336,7 +382,7 @@ namespace RegistryEditor
         private RegistryEditor.CustomTreeView registryTreeView;
         private RegistryEditor.CustomTreeView groupRegistryTreeView;
         private System.Windows.Forms.Button btnMapRegistry;
-        private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnRename;
         private System.Windows.Forms.Button btnNewGroup;
@@ -347,15 +393,18 @@ namespace RegistryEditor
         private System.Windows.Forms.RadioButton radioBtnManualRegistry;
         private System.Windows.Forms.GroupBox mainGroupBox;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.DateTimePicker startDateTimePicker;
+        private System.Windows.Forms.DateTimePicker startDate;
         private System.Windows.Forms.TextBox tbBackupFolder;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnBackupLog;
-        private System.Windows.Forms.DateTimePicker endDateTimePicker;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lblStartDate;
         private System.Windows.Forms.Button btnBrowse;
         private System.Windows.Forms.Button btnOpenFolder;
+        private System.Windows.Forms.DateTimePicker startTime;
+        private System.Windows.Forms.DateTimePicker endTime;
+        private System.Windows.Forms.DateTimePicker endDate;
+        private System.Windows.Forms.Button btnExit;
     }
 }
 

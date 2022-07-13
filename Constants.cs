@@ -55,5 +55,7 @@ namespace RegistryEditor
         public const string ApplicationName = "SP1 Log Collector";
         public const string MainWindowTitleFormat = ApplicationName + " (Root: {0})";
         public const string RegistryPickerTitleFormat = "RegistryPicker ({0})";
+        public const string BackupLogsFolder = "backup_{0}_{1}\\logs";
+        public const string BackupDateTimeFormat = "yyyyMMddhhmmssfff";
     }
 }
