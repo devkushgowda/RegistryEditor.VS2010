@@ -35,7 +35,8 @@ namespace RegistryEditor
         public const string DatabaseWarningMessage = "When you select Database the wafer scan will take more time. Do you still want to enable the setting?";
         public const string ClearAllWarningMessage = "You are going to clear all the registry values in current window, would you like to proceed?";
         public const string GroupRegistryAlreadyExistsMessage = "This group registry with name '{0}' already exists, try again with different name.";
-        public const string BackupCompletedMessage = "Would you like to browse the backup location?";
+        public const string BackupCompletedBrowseFolderMessage = "Would you like to browse the backup location?";
+        public const string BackupCompletedNoDataFoundMessage = "No data found!";
         public const string GroupRegistryDeleteConfirmationMessage = "Registry group '{0}' will be deleted permanently, would you like to proceed?";
         public const string InformationTitle = "Information";
         public const string WarningTitle = "Warning!";
@@ -57,5 +58,6 @@ namespace RegistryEditor
         public const string RegistryPickerTitleFormat = "RegistryPicker ({0})";
         public const string BackupLogsFolder = "backup_{0}_{1}\\logs";
         public const string BackupDateTimeFormat = "yyyyMMddhhmmssfff";
+        public const int BackupLastHours = 10;
     }
 }

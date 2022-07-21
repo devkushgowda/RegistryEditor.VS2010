@@ -89,7 +89,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="Data\RegistryEditorConfiguration.xml">
+    <None Include="RegistryEditorConfiguration.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

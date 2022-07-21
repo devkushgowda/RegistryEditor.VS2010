@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -14,12 +15,12 @@ namespace RegistryEditor
     {
         private DateTime startDateTime
         {
-            get { return startDate.Value + startTime.Value.TimeOfDay; }
+            get { return radioBtnByDays.Checked ? startDate.Value + startTime.Value.TimeOfDay : DateTime.Now.AddHours(-((int)cbHours.SelectedItem)); }
         }
 
         private DateTime endDateTime
         {
-            get { return endDate.Value + endTime.Value.TimeOfDay; }
+            get { return radioBtnByDays.Checked ? endDate.Value + endTime.Value.TimeOfDay : DateTime.Now; }
         }
 
         private int _threadSafeMutexForCheckedBackValue = 0;
@@ -52,7 +53,18 @@ namespace RegistryEditor
             SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
             SetLogButtonStates();
             ResetDates();
+            SetBackupLastHours();
+            EnableDisableLogDurationArea();
             RegistryKeysOperation.SetLogParameters(IsChangesAvailableToReset(registryTreeView.Nodes));
+        }
+
+        private void SetBackupLastHours()
+        {
+            for (var i = 1; i <= Constants.BackupLastHours; i++)
+            {
+                cbHours.Items.Add(i);
+            }
+            cbHours.SelectedIndex = 1;
         }
 
         /// <summary>
@@ -438,23 +450,27 @@ namespace RegistryEditor
         private void SetLogButtonStates()
         {
             var backupFolderExists = Directory.Exists(tbBackupFolder.Text);
-            if (btnOpenFolder.Enabled)
-                btnOpenFolder.Enabled = backupFolderExists;
-            btnBackupLog.Enabled = backupFolderExists && startDateTime < endDateTime;
+            btnOpenFolder.Enabled = backupFolderExists;
+            var dateTimeIsValid = radioBtnByHours.Checked || startDateTime < endDateTime;
+            btnBackupLog.Enabled = backupFolderExists && dateTimeIsValid;
         }
 
         /// <summary>
         /// Get log destination folder path.
         /// </summary>
-        /// <param name="path"></param>
         /// <returns></returns>
-        private string GetLogDestinationFolder(string path)
+        private string GetLogDestinationFolder()
         {
             return Path.Combine(tbBackupFolder.Text,
                 string.Format(Constants.BackupLogsFolder,
                     startDateTime.ToString(Constants.BackupDateTimeFormat),
-                    endDateTime.ToString(Constants.BackupDateTimeFormat)),
-                Path.GetFileName(path));
+                    endDateTime.ToString(Constants.BackupDateTimeFormat)));
+        }
+
+        private void EnableDisableLogDurationArea()
+        {
+            lblLast.Enabled = lblHours.Enabled = cbHours.Enabled = !radioBtnByDays.Checked;
+            lblStartDate.Enabled = lblEndDate.Enabled = endDate.Enabled = startDate.Enabled = endTime.Enabled = startTime.Enabled = radioBtnByDays.Checked;
         }
 
         #region EventHandlers
@@ -486,6 +502,7 @@ namespace RegistryEditor
                 {
                     var newGroupTreeNode = CreateNewGroup(inputForm);
                     MapRegistry(newGroupTreeNode);
+                    ConfigurationHelper.Save();
                     Reload();
                     SetRegistryButtonStates(radioBtnGroupRegistry.Checked);
                 }
@@ -623,21 +640,32 @@ namespace RegistryEditor
         private void tbBackupFolder_TextChanged(object sender, EventArgs e)
         {
             SetLogButtonStates();
+            if (Directory.Exists(tbBackupFolder.Text))
+            {
+                ConfigurationHelper.Configuration.DefaultBackupFolder = tbBackupFolder.Text;
+                ConfigurationHelper.Save();
+            }
         }
 
         private void btnBackupLog_Click(object sender, EventArgs e)
         {
-            btnOpenFolder.Enabled = true;
-            btnBackupLog.Enabled = false;
             var logPathFromRegistry = RegistryKeysOperation.GetLogFilePath();
             var logPathFromConfig = ConfigurationHelper.Configuration.LogFolderPath;
-
-            LogFilesHelper.Copy(logPathFromRegistry, GetLogDestinationFolder(logPathFromRegistry), startDateTime, endDateTime, Constants.LogFileFilter);
-            LogFilesHelper.Copy(logPathFromConfig, GetLogDestinationFolder(logPathFromConfig), startDateTime, endDateTime, Constants.LogFileFilter);
-            if (MessageBox.Show(Constants.BackupCompletedMessage, Constants.BackupCompletedTitle,
-                    MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+            var resultFiles = LogFilesHelper.FilterFiles(new List<string> { logPathFromRegistry, logPathFromConfig }, startDateTime, endDateTime, Constants.LogFileFilter);
+            if (resultFiles.Count > 0)
             {
-                Process.Start(GetLogDestinationFolder(string.Empty));
+                var destPath = GetLogDestinationFolder();
+                LogFilesHelper.Copy(resultFiles, destPath);
+                if (MessageBox.Show(Constants.BackupCompletedBrowseFolderMessage, Constants.BackupCompletedTitle,
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+                {
+                    Process.Start(destPath);
+                }
+            }
+            else
+            {
+                MessageBox.Show(Constants.BackupCompletedNoDataFoundMessage, Constants.BackupCompletedTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -679,6 +707,15 @@ namespace RegistryEditor
         {
             this.Close();
         }
+
+        private void radioBtnByDays_CheckedChanged(object sender, EventArgs e)
+        {
+            EnableDisableLogDurationArea();
+        }
         #endregion
+
+
+
+
     }
 }

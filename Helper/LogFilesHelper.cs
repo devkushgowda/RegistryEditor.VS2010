@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -6,18 +7,27 @@ namespace RegistryEditor.Helper
 {
     public static class LogFilesHelper
     {
-        public static void Copy(string source, string destination, DateTime from, DateTime to, string filter)
+        public static List<FileInfo> FilterFiles(List<string> source, DateTime from, DateTime to, string filter)
         {
-            if (!Directory.Exists(source))
-                return;
-            Directory.CreateDirectory(destination);
-            var dirInfo = new DirectoryInfo(source);
-            var allFiles = filter.Split('|').SelectMany(e => dirInfo.GetFiles(e.Trim()));
-            var files = allFiles.Where(f =>
+            var result = new List<FileInfo>();
+            source.ForEach(path =>
             {
-                var dt = f.CreationTime;
-                return dt >= from && dt <= to;
-            }).ToList();
+                if (!Directory.Exists(path))
+                    return;
+                var dirInfo = new DirectoryInfo(path);
+                var allFiles = filter.Split('|').SelectMany(e => dirInfo.GetFiles(e.Trim()));
+                result.AddRange(allFiles.Where(f =>
+                {
+                    var dt = f.CreationTime;
+                    return dt >= from && dt <= to;
+                }));
+            });
+            return result;
+        }
+
+        public static void Copy(List<FileInfo> files, string destination)
+        {
+            Directory.CreateDirectory(destination);
             files.ForEach(f => f.CopyTo(Path.Combine(destination, f.Name), true));
         }
     }
