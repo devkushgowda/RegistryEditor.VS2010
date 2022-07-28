@@ -15,7 +15,7 @@ namespace RegistryEditor
 
         private void okButton_Click(object sender, System.EventArgs e)
         {
-            if (!string.IsNullOrEmpty(textBox1.Text) && _initialValue != textBox1.Text)
+            if (!string.IsNullOrEmpty(textBox1.Text.Trim()) && _initialValue != textBox1.Text)
             {
                 InputText = textBox1.Text;
                 this.Close();

@@ -5,10 +5,9 @@ namespace RegistryEditor.Helper
 {
     public static class ConfigurationHelper
     {
-        private static readonly Lazy<RegistryEditorConfiguration> _configuration =
-            new Lazy<RegistryEditorConfiguration>(() => Load());
+        private static readonly RegistryEditorConfiguration _configuration = Load();
 
-        public static RegistryEditorConfiguration Configuration { get { return _configuration.Value; } }
+        public static RegistryEditorConfiguration Configuration { get { return _configuration; } }
 
         private static RegistryEditorConfiguration Load()
         {

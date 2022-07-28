@@ -25,7 +25,7 @@ namespace RegistryEditor
                 var clone = (TreeNode)node.Clone();
                 clone.Checked = false;
                 registryTree.Nodes.Add(clone);
-                var xNodes = registryTree.Nodes.AsParallel().Cast<TreeNode>().Where(n => exclude.Contains(n.Text));
+                var xNodes = registryTree.Nodes.Cast<TreeNode>().Where(n => exclude.Contains(n.Text));
                 foreach (var xNode in xNodes)
                 {
                     registryTree.Nodes.Remove(xNode);
@@ -35,14 +35,14 @@ namespace RegistryEditor
 
         private void okButton_Click(object sender, EventArgs e)
         {
-            SelectedRegistryList = registryTree.Nodes.AsParallel().Cast<TreeNode>().Where(t => t.Checked)
+            SelectedRegistryList = registryTree.Nodes.Cast<TreeNode>().Where(t => t.Checked)
                 .Select(t => ((RegistryEntry)t.Tag).Name).ToList();
             this.Close();
         }
 
         private void registryTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            okButton.Enabled = registryTree.Nodes.AsParallel().Cast<TreeNode>().Any(t => t.Checked);
+            okButton.Enabled = registryTree.Nodes.Cast<TreeNode>().Any(t => t.Checked);
         }
     }
 }

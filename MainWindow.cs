@@ -90,7 +90,7 @@ namespace RegistryEditor
             {
                 var node = new TreeNode(registryGroup.Name);
                 LoadRegistryGroupTree(node, registryGroup);
-                node.Checked = node.Nodes.AsParallel().OfType<TreeNode>().Where(n => n.ForeColor != Color.Red).All(n => n.Checked);
+                node.Checked = node.Nodes.OfType<TreeNode>().Where(n => n.ForeColor != Color.Red).All(n => n.Checked);
                 groupRegistryTreeView.Nodes.Add(node);
             }
             groupRegistryTreeView.CollapseAll();
@@ -209,17 +209,17 @@ namespace RegistryEditor
 
                 if (checkedNode.Parent != null)
                 {
-                    checkedNode.Parent.Checked = checkedNode.Parent.Nodes.AsParallel().OfType<TreeNode>()
+                    checkedNode.Parent.Checked = checkedNode.Parent.Nodes.OfType<TreeNode>()
                         .Where(n => n.ForeColor != Color.Red).All(n => n.Checked);
                     checkedNode.Parent.ForeColor =
-                        checkedNode.Parent.Nodes.AsParallel().Cast<TreeNode>().Any(n => n.ForeColor == Color.Blue)
+                        checkedNode.Parent.Nodes.Cast<TreeNode>().Any(n => n.ForeColor == Color.Blue)
                             ? Color.Blue
                             : Color.Black;
                 }
             }
             else
             {
-                checkedNode.ForeColor = checkedNode.Nodes.AsParallel().Cast<TreeNode>().Any(n => n.ForeColor == Color.Blue) ? Color.Blue : Color.Black;
+                checkedNode.ForeColor = checkedNode.Nodes.Cast<TreeNode>().Any(n => n.ForeColor == Color.Blue) ? Color.Blue : Color.Black;
             }
         }
 
@@ -355,7 +355,7 @@ namespace RegistryEditor
                 if (eNode.Tag is RegistryEntry)
                 {
                     var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path) && Constants
+                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrEmpty(re.Path) && Constants
                             .CriticalKeysForWarning.Split(',').Any(val =>
                                 re.Path.EndsWith(val.Trim(), StringComparison.InvariantCultureIgnoreCase)))
                     {
@@ -381,7 +381,7 @@ namespace RegistryEditor
                 if (eNode.Tag is RegistryEntry)
                 {
                     var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrWhiteSpace(re.Path))
+                    if (re != null && re.IsChecked != eNode.Checked && !string.IsNullOrEmpty(re.Path))
                     {
                         RegistryKeysOperation.SetRegistryValue(re.Path, eNode.Checked);
                     }
@@ -402,7 +402,7 @@ namespace RegistryEditor
                 if (eNode.Tag is RegistryEntry)
                 {
                     var re = (RegistryEntry)eNode.Tag;
-                    if (re != null && !string.IsNullOrWhiteSpace(re.Path))
+                    if (re != null && !string.IsNullOrEmpty(re.Path))
                     {
                         RegistryKeysOperation.SetRegistryValue(re.Path, value);
                     }
@@ -493,7 +493,7 @@ namespace RegistryEditor
             inputForm.ShowDialog();
             if (!string.IsNullOrEmpty(inputForm.InputText))
             {
-                if (groupRegistryTreeView.Nodes.AsParallel().Cast<TreeNode>().Any(node =>
+                if (groupRegistryTreeView.Nodes.Cast<TreeNode>().Any(node =>
                         node.Text.Equals(inputForm.InputText, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     DisplayInformation(string.Format(Constants.GroupRegistryAlreadyExistsMessage, inputForm.InputText));
@@ -518,7 +518,7 @@ namespace RegistryEditor
             inputForm.ShowDialog();
             if (!string.IsNullOrEmpty(inputForm.InputText))
             {
-                if (groupRegistryTreeView.Nodes.AsParallel().Cast<TreeNode>().Any(node => node != selectedNode && node.Text.Equals(inputForm.InputText, StringComparison.InvariantCultureIgnoreCase)))
+                if (groupRegistryTreeView.Nodes.Cast<TreeNode>().Any(node => node != selectedNode && node.Text.Equals(inputForm.InputText, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     DisplayInformation(string.Format(Constants.GroupRegistryAlreadyExistsMessage, inputForm.InputText));
                 }
